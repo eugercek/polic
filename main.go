@@ -12,6 +12,7 @@ import (
 const (
 	DOWNLOAD_URL  = "https://awspolicygen.s3.amazonaws.com/js/policies.js"
 	REMOVE_PREFIX = "app.PolicyEditorConfig="
+	NO_COLOR      = false
 )
 
 type PolicyDocument struct {
@@ -35,6 +36,10 @@ func main() {
 		fmt.Print("Enter an AWS action:")
 		var inp string
 		fmt.Scanln(&inp)
+
+		if inp == "exit" {
+			break
+		}
 		args := strings.Split(inp, ":")
 
 		if len(args) != 2 {
@@ -90,9 +95,18 @@ func expandAction(service string, folded string, data *PolicyDocument) (ret []st
 	// TODO Optimize
 	for _, v := range actions {
 		if strings.Contains(v, s) {
-			ret = append(ret, v)
+			if NO_COLOR {
+				ret = append(ret, v)
+			} else {
+				ret = append(ret, colored(v, s))
+			}
 		}
 	}
 
 	return ret
+}
+
+// paint c in s
+func colored(s string, c string) string {
+	return strings.Replace(s, c, fmt.Sprintf("\x1b[32m%s\x1b[0m", c), 1)
 }
