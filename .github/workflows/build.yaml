@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Linux
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+            go-version-file: 'go.mod'
+
+      - run: go version
+
+      - name: Build for Linux
+        run: go build -o pol-exp .
+        env:
+          GOOS: linux
+      - name: Build for Windows
+        run: go build -o pol-exp.exe .
+        env:
+          GOOS: windows
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "pol-exp*"
+          token: ${{ github.token}}
