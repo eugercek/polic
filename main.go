@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -25,6 +27,10 @@ type Service struct {
 }
 
 func main() {
+	single := flag.Bool("single", false, "convert single")
+	flag.Parse()
+
+	fmt.Println("Downloading policies...")
 	data, err := getData()
 
 	if err != nil {
@@ -32,25 +38,40 @@ func main() {
 		os.Exit(1)
 	}
 
-	for {
-		fmt.Print("Enter an AWS action:")
-		var inp string
-		fmt.Scanln(&inp)
-
-		if inp == "exit" {
-			break
-		}
-		args := strings.Split(inp, ":")
-
-		if len(args) != 2 {
-			fmt.Println("Wrong type of input!")
-			continue
+	if *single {
+		if flag.Args() == nil {
+			fmt.Println("No action given")
 		}
 
-		actions := expandAction(args[0], args[1], data)
+		actions, err := expandAction(flag.Args()[0], data)
 
-		for _, v := range actions {
-			fmt.Println(v)
+		if err != nil {
+			fmt.Println(err, flag.Args()[0])
+		} else {
+			for _, v := range actions {
+				fmt.Println(v)
+			}
+		}
+	} else {
+		for {
+			fmt.Print("Enter an AWS action:")
+			var inp string
+			fmt.Scanln(&inp)
+
+			if inp == "exit" {
+				break
+			}
+
+			actions, err := expandAction(inp, data)
+
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+
+			for _, v := range actions {
+				fmt.Println(v)
+			}
 		}
 	}
 }
@@ -76,9 +97,18 @@ func getData() (data *PolicyDocument, err error) {
 	return data, nil
 }
 
-func expandAction(service string, folded string, data *PolicyDocument) (ret []string) {
+func expandAction(inp string, data *PolicyDocument) (ret []string, err error) {
+	args := strings.Split(inp, ":")
+
+	if len(args) != 2 {
+		return nil, errors.New("wrong type of input")
+	}
+
+	service := args[0]
+	folded := args[1]
+
 	if !strings.Contains(folded, "*") {
-		return []string{folded}
+		return []string{folded}, nil
 	}
 
 	var actions []string
@@ -103,7 +133,7 @@ func expandAction(service string, folded string, data *PolicyDocument) (ret []st
 		}
 	}
 
-	return ret
+	return ret, nil
 }
 
 // paint c in s
