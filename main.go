@@ -14,7 +14,6 @@ import (
 const (
 	DOWNLOAD_URL  = "https://awspolicygen.s3.amazonaws.com/js/policies.js"
 	REMOVE_PREFIX = "app.PolicyEditorConfig="
-	NO_COLOR      = false
 )
 
 type PolicyDocument struct {
@@ -26,8 +25,29 @@ type Service struct {
 	Actions      []string `json:"Actions"`
 }
 
+type Policy struct {
+	Version    string      `json:"Version"`
+	Id         string      `json:"ID,omitempty"`
+	Statements []Statement `json:"Statement"`
+}
+
+// TODO Handle Sum type
+type Statement struct {
+	StatementId   string              `json:"Sid,omitempty"`
+	Effect        string              `json:"Effect"`
+	Actions       []string            `json:"Action"`
+	NotActions    []string            `json:"NotAction,omitempty"`
+	Principals    map[string][]string `json:"Principal,omitempty"`
+	NotPrincipals map[string][]string `json:"NotPrincipal,omitempty"`
+	Resources     []string            `json:"Resource,omitempty"`
+	NotResources  []string            `json:"NotResource,omitempty"`
+	Condition     []string            `json:"Condition,omitempty"`
+}
+
 func main() {
 	single := flag.Bool("single", false, "convert single")
+	file := flag.Bool("file", false, "expand inline in a file")
+
 	flag.Parse()
 
 	fmt.Println("Downloading policies...")
@@ -51,6 +71,64 @@ func main() {
 			for _, v := range actions {
 				fmt.Println(v)
 			}
+		}
+	} else if *file {
+		if flag.Args() == nil {
+			fmt.Println("No file given")
+			os.Exit(1)
+		}
+
+		file, err := os.Open(flag.Args()[0])
+
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		bytes, _ := ioutil.ReadAll(file)
+
+		var policy Policy
+		err = json.Unmarshal(bytes, &policy)
+
+		if err != nil {
+			fmt.Println("can't parse policy", err)
+			os.Exit(1)
+		}
+
+		for i, st := range policy.Statements {
+			var actions []string
+			// A policy can't have both Action and NotAction
+			if st.Actions != nil {
+				for _, a := range st.Actions {
+					if strings.Contains(a, "*") {
+						exps, _ := expandAction(a, data)
+						actions = append(actions, exps...)
+					} else {
+						actions = append(actions, a)
+					}
+
+				}
+				policy.Statements[i].Actions = actions
+			} else if st.NotActions != nil {
+				for _, a := range st.NotActions {
+					if strings.Contains(a, "*") {
+						exps, _ := expandAction(a, data)
+						actions = append(actions, exps...)
+					} else {
+						actions = append(actions, a)
+					}
+
+				}
+				policy.Statements[i].Actions = actions
+			}
+		}
+
+		file.Close()
+
+		f, _ := json.MarshalIndent(policy, "", "\t")
+		err = ioutil.WriteFile(flag.Args()[0], f, 0644)
+		if err != nil {
+			fmt.Println(err)
 		}
 	} else {
 		for {
@@ -120,16 +198,13 @@ func expandAction(inp string, data *PolicyDocument) (ret []string, err error) {
 		}
 	}
 
+	// strings.Contains("foo", "") -> true
 	s := strings.Replace(folded, "*", "", 1)
 
 	// TODO Optimize
-	for _, v := range actions {
-		if strings.Contains(v, s) {
-			if NO_COLOR {
-				ret = append(ret, v)
-			} else {
-				ret = append(ret, colored(v, s))
-			}
+	for _, a := range actions {
+		if strings.Contains(a, s) {
+			ret = append(ret, service+":"+a)
 		}
 	}
 

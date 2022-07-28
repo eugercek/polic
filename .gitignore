@@ -19,3 +19,6 @@
 
 # Go workspace file
 go.work
+
+aws-iam-policy-expander
+.idea

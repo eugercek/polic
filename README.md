@@ -7,30 +7,30 @@ Expand cryptic policies to achieve least privilege
 ## Expand single action
 ```sh
 $ ./aws-iam-policy-expander -single waf:Get*
-GetByteMatchSet
-GetChangeToken
-GetChangeTokenStatus
-GetGeoMatchSet
-GetIPSet
-GetLoggingConfiguration
-GetPermissionPolicy
-GetRateBasedRule
-GetRateBasedRuleManagedKeys
-GetRegexMatchSet
-GetRegexPatternSet
-GetRule
-GetRuleGroup
-GetSampledRequests
-GetSizeConstraintSet
-GetSqlInjectionMatchSet
-GetWebACL
-GetXssMatchSet
+waf:GetByteMatchSet
+waf:GetChangeToken
+waf:GetChangeTokenStatus
+waf:GetGeoMatchSet
+waf:GetIPSet
+waf:GetLoggingConfiguration
+waf:GetPermissionPolicy
+waf:GetRateBasedRule
+waf:GetRateBasedRuleManagedKeys
+waf:GetRegexMatchSet
+waf:GetRegexPatternSet
+waf:GetRule
+waf:GetRuleGroup
+waf:GetSampledRequests
+waf:GetSizeConstraintSet
+waf:GetSqlInjectionMatchSet
+waf:GetWebACL
+waf:GetXssMatchSet
 ```
 
 ## Expand in a repl
 
 ```sh
-$ ./aws-iam-policy-expander 
+$ ./aws-iam-policy-expander
 Enter an AWS action: (enter-something)
 .... # results
 Enter an AWS action: (enter-something)
@@ -40,4 +40,5 @@ Enter an AWS action: exit # Or <Ctrl-C>
 
 # TODO
 
-Add whole policy expander
+- Handle sum type problem in policy type
+- Add sort option
