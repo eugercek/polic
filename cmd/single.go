@@ -4,18 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eugercek/aws-iam-policy-expander/cmd/fetch"
+	"github.com/eugercek/aws-iam-policy-expander/cmd/expander"
 )
 
 func Single(action string) int {
-	data, err := fetch.GetData()
-
-	if err != nil {
-		fmt.Println(err)
-		return 1
-	}
-
-	actions, base, err := fetch.ExpandAction(action, data)
+	actions, base, err := expander.ExpandAction(action)
 
 	if err != nil {
 		fmt.Println(err, action)

@@ -9,18 +9,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eugercek/aws-iam-policy-expander/cmd/fetch"
+	"github.com/eugercek/aws-iam-policy-expander/cmd/expander"
 	"github.com/eugercek/aws-iam-policy-expander/cmd/policy"
 )
 
 func File(filename string) int {
-	data, err := fetch.GetData()
-
-	if err != nil {
-		fmt.Println(err)
-		return 1
-	}
-
 	file, err := os.Open(flag.Args()[0])
 
 	if err != nil {
@@ -57,7 +50,7 @@ func File(filename string) int {
 
 		for _, str := range elems {
 			if strings.Contains(str, "*") {
-				exps, _, _ := fetch.ExpandAction(str, data)
+				exps, _, _ := expander.ExpandAction(str)
 				actions = append(actions, exps...)
 			} else {
 				actions = append(actions, str)

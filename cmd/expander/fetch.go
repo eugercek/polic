@@ -1,4 +1,4 @@
-package fetch
+package expander
 
 import (
 	"encoding/json"
@@ -14,6 +14,8 @@ const (
 	REMOVE_PREFIX = "app.PolicyEditorConfig="
 )
 
+var policyDocument *PolicyDocument
+
 type PolicyDocument struct {
 	ServiceMap map[string]Service `json:"serviceMap"`
 }
@@ -23,12 +25,12 @@ type Service struct {
 	Actions      []string `json:"Actions"`
 }
 
-func GetData() (data *PolicyDocument, err error) {
+func getData() (err error) {
 	fmt.Println("Downloading policies...")
 	resp, err := http.Get(DOWNLOAD_URL)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer resp.Body.Close()
@@ -36,16 +38,24 @@ func GetData() (data *PolicyDocument, err error) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	body = body[len(REMOVE_PREFIX):] // It's used for editor config
 
-	err = json.Unmarshal(body, &data)
+	err = json.Unmarshal(body, policyDocument)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return data, nil
+	return nil
 }
 
-func ExpandAction(inp string, data *PolicyDocument) (ret []string, str string, err error) {
+func ExpandAction(inp string) (ret []string, str string, err error) {
+	if policyDocument == nil {
+		err := getData()
+
+		if err != nil {
+			return nil, "", err
+		}
+	}
+
 	args := strings.Split(inp, ":")
 
 	if len(args) != 2 {
@@ -61,7 +71,7 @@ func ExpandAction(inp string, data *PolicyDocument) (ret []string, str string, e
 
 	var actions []string
 
-	for _, v := range data.ServiceMap {
+	for _, v := range policyDocument.ServiceMap {
 		if v.StringPrefix == service {
 			actions = v.Actions
 			break

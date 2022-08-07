@@ -3,16 +3,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/eugercek/aws-iam-policy-expander/cmd/fetch"
+	"github.com/eugercek/aws-iam-policy-expander/cmd/expander"
 )
 
 func Repl() int {
-	data, err := fetch.GetData()
-	if err != nil {
-		fmt.Println(err)
-		return 1
-	}
-
 	for {
 		fmt.Print("Enter an AWS action:")
 		var inp string
@@ -22,7 +16,7 @@ func Repl() int {
 			break
 		}
 
-		actions, base, err := fetch.ExpandAction(inp, data)
+		actions, base, err := expander.ExpandAction(inp)
 
 		if err != nil {
 			fmt.Println(err)
