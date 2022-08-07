@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -23,25 +24,6 @@ type PolicyDocument struct {
 type Service struct {
 	StringPrefix string   `json:"StringPrefix"`
 	Actions      []string `json:"Actions"`
-}
-
-type Policy struct {
-	Version    string      `json:"Version"`
-	Id         string      `json:"ID,omitempty"`
-	Statements []Statement `json:"Statement"`
-}
-
-// TODO Handle Sum type
-type Statement struct {
-	StatementId   string              `json:"Sid,omitempty"`
-	Effect        string              `json:"Effect"`
-	Actions       []string            `json:"Action"`
-	NotActions    []string            `json:"NotAction,omitempty"`
-	Principals    map[string][]string `json:"Principal,omitempty"`
-	NotPrincipals map[string][]string `json:"NotPrincipal,omitempty"`
-	Resources     []string            `json:"Resource,omitempty"`
-	NotResources  []string            `json:"NotResource,omitempty"`
-	Condition     []string            `json:"Condition,omitempty"`
 }
 
 func main() {
@@ -88,6 +70,7 @@ func main() {
 		bytes, _ := ioutil.ReadAll(file)
 
 		var policy Policy
+
 		err = json.Unmarshal(bytes, &policy)
 
 		if err != nil {
@@ -95,38 +78,43 @@ func main() {
 			os.Exit(1)
 		}
 
+		sts := policy.Statements
+
 		for i, st := range policy.Statements {
 			var actions []string
-			// A policy can't have both Action and NotAction
-			if st.Actions != nil {
-				for _, a := range st.Actions {
-					if strings.Contains(a, "*") {
-						exps, _ := expandAction(a, data)
-						actions = append(actions, exps...)
-					} else {
-						actions = append(actions, a)
-					}
+			var setter func(int, []string)
+			var elems []string
 
+			if st.Action != nil {
+				setter = func(i int, as []string) {
+					sts[i].Action = as
 				}
-				policy.Statements[i].Actions = actions
-			} else if st.NotActions != nil {
-				for _, a := range st.NotActions {
-					if strings.Contains(a, "*") {
-						exps, _ := expandAction(a, data)
-						actions = append(actions, exps...)
-					} else {
-						actions = append(actions, a)
-					}
+				elems = st.Action
+			} else if st.NotAction != nil {
+				setter = func(i int, nas []string) {
+					sts[i].NotAction = nas
+				}
+				elems = st.NotAction
+			} else {
+				log.Fatal("Action or NotAction must be given.")
+			}
 
+			for _, str := range elems {
+				if strings.Contains(str, "*") {
+					exps, _ := expandAction(str, data)
+					actions = append(actions, exps...)
+				} else {
+					actions = append(actions, str)
 				}
-				policy.Statements[i].Actions = actions
+				setter(i, actions)
+				fmt.Println(actions)
 			}
 		}
 
 		file.Close()
 
 		f, _ := json.MarshalIndent(policy, "", "\t")
-		err = ioutil.WriteFile(flag.Args()[0], f, 0644)
+		err = ioutil.WriteFile("res.json", f, 0644)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -209,9 +197,4 @@ func expandAction(inp string, data *PolicyDocument) (ret []string, err error) {
 	}
 
 	return ret, nil
-}
-
-// paint c in s
-func colored(s string, c string) string {
-	return strings.Replace(s, c, fmt.Sprintf("\x1b[32m%s\x1b[0m", c), 1)
 }
