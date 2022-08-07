@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	policy "github.com/eugercek/aws-iam-policy-expander/policy"
 )
 
 const (
@@ -67,15 +69,10 @@ func main() {
 			os.Exit(1)
 		}
 
-		bytes, _ := ioutil.ReadAll(file)
-
-		var policy Policy
-
-		err = json.Unmarshal(bytes, &policy)
+		policy, err := policy.New(file)
 
 		if err != nil {
-			fmt.Println("can't parse policy", err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		sts := policy.Statements
@@ -107,7 +104,6 @@ func main() {
 					actions = append(actions, str)
 				}
 				setter(i, actions)
-				fmt.Println(actions)
 			}
 		}
 
