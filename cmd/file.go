@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -13,8 +12,8 @@ import (
 	"github.com/eugercek/aws-iam-policy-expander/cmd/policy"
 )
 
-func File(filename string) int {
-	file, err := os.Open(flag.Args()[0])
+func File(filename, resultFile string) int {
+	file, err := os.Open(filename)
 
 	if err != nil {
 		fmt.Println(err)
@@ -62,7 +61,7 @@ func File(filename string) int {
 	file.Close()
 
 	f, _ := json.MarshalIndent(policy, "", "\t")
-	err = ioutil.WriteFile("res.json", f, 0644)
+	err = ioutil.WriteFile(resultFile, f, 0644)
 	if err != nil {
 		fmt.Println(err)
 	}

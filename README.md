@@ -4,7 +4,20 @@ Expand cryptic policies to achieve least privilege
 
 # Usage
 
+## Expand policy file and save as
+
+```sh
+$ ./aws-iam-policy-expander -file=foo.json -out=out.json
+```
+
+## Expand policy file and change the file
+
+```sh
+$ ./aws-iam-policy-expander -file=foo.json -inline
+```
+
 ## Expand single action
+
 ```sh
 $ ./aws-iam-policy-expander -single waf:Get*
 waf:GetByteMatchSet
@@ -40,5 +53,4 @@ Enter an AWS action: exit # Or <Ctrl-C>
 
 # TODO
 
-- Handle sum type problem in policy type
 - Add sort option

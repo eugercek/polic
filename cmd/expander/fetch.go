@@ -38,7 +38,10 @@ func getData() (err error) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	body = body[len(REMOVE_PREFIX):] // It's used for editor config
 
-	err = json.Unmarshal(body, policyDocument)
+	var data PolicyDocument
+	err = json.Unmarshal(body, &data)
+
+	policyDocument = &data
 
 	if err != nil {
 		return err
