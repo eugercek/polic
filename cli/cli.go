@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/eugercek/aws-iam-policy-expander/cmd"
+	"github.com/eugercek/polic/cmd"
 )
 
 func Run() int {
@@ -13,6 +13,7 @@ func Run() int {
 	repl := flag.Bool("repl", false, "open in repl mode")
 	out := flag.String("out", "", "output file name (only for file flag)")
 	inline := flag.Bool("inline", false, "change the (input) policy file (only for file flag")
+	sorted := flag.Bool("sort", false, "make actions sorted in files")
 
 	flag.Parse()
 
@@ -20,6 +21,10 @@ func Run() int {
 		if flag.Args() == nil {
 			fmt.Println("No action given")
 			return 1
+		}
+
+		if *sorted {
+			fmt.Println("No need for sort, single is always sorted")
 		}
 
 		return cmd.Single(flag.Args()[0])
@@ -35,8 +40,11 @@ func Run() int {
 			return 1
 		}
 
-		return cmd.File(*file, resultFile)
+		return cmd.File(*file, resultFile, *sorted)
 	} else if !*single && *file == "" && *repl {
+		if *sorted {
+			fmt.Println("No need for sort, repl is always sorted")
+		}
 		return cmd.Repl()
 	} else {
 		fmt.Println("Wrong flag. Given")

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eugercek/aws-iam-policy-expander/cmd/expander"
+	"github.com/eugercek/polic/cmd/expander"
 )
 
 func Single(action string) int {
@@ -16,7 +16,7 @@ func Single(action string) int {
 	}
 
 	for _, v := range actions {
-		fmt.Println(color(v, base))
+		fmt.Println(color(v, base[:len(base)-1]))
 	}
 	return 0
 }

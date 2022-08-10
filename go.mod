@@ -1,3 +1,3 @@
-module github.com/eugercek/aws-iam-policy-expander
+module github.com/eugercek/polic
 
 go 1.18

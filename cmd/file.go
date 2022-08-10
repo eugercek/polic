@@ -6,13 +6,14 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
-	"github.com/eugercek/aws-iam-policy-expander/cmd/expander"
-	"github.com/eugercek/aws-iam-policy-expander/cmd/policy"
+	"github.com/eugercek/polic/cmd/expander"
+	"github.com/eugercek/polic/cmd/policy"
 )
 
-func File(filename, resultFile string) int {
+func File(filename, resultFile string, sortFlag bool) int {
 	file, err := os.Open(filename)
 
 	if err != nil {
@@ -44,7 +45,8 @@ func File(filename, resultFile string) int {
 			}
 			elems = st.NotAction
 		} else {
-			log.Fatal("Action or NotAction must be given.")
+			log.Println("Action or NotAction must be given.")
+			return 1
 		}
 
 		for _, str := range elems {
@@ -54,6 +56,11 @@ func File(filename, resultFile string) int {
 			} else {
 				actions = append(actions, str)
 			}
+
+			if sortFlag {
+				sort.Strings(actions)
+			}
+
 			setter(i, actions)
 		}
 	}

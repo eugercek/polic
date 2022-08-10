@@ -7,19 +7,19 @@ Expand cryptic policies to achieve least privilege
 ## Expand policy file and save as
 
 ```sh
-$ ./aws-iam-policy-expander -file=foo.json -out=out.json
+$ ./polic --file=foo.json --out=out.json # Also can --sort
 ```
 
 ## Expand policy file and change the file
 
 ```sh
-$ ./aws-iam-policy-expander -file=foo.json -inline
+$ ./polic --file=foo.json --inline --sort
 ```
 
 ## Expand single action
 
 ```sh
-$ ./aws-iam-policy-expander -single waf:Get*
+$ ./polic -single waf:Get*
 waf:GetByteMatchSet
 waf:GetChangeToken
 waf:GetChangeTokenStatus
@@ -43,7 +43,7 @@ waf:GetXssMatchSet
 ## Expand in a repl
 
 ```sh
-$ ./aws-iam-policy-expander
+$ ./polic
 Enter an AWS action: (enter-something)
 .... # results
 Enter an AWS action: (enter-something)
@@ -53,4 +53,3 @@ Enter an AWS action: exit # Or <Ctrl-C>
 
 # TODO
 
-- Add sort option

@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Linux
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
@@ -21,15 +21,21 @@ jobs:
       - run: go version
 
       - name: Build for Linux
-        run: go build -o pol-exp .
+        run: go build -o polic .
         env:
           GOOS: linux
+
       - name: Build for Windows
-        run: go build -o pol-exp.exe .
+        run: go build -o polic.exe .
         env:
           GOOS: windows
 
+      - name: Build for Mac
+        run: go build -o polic-mac
+        env:
+          GOOS: darwin
+
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "pol-exp*"
+          artifacts: "polic*"
           token: ${{ github.token}}

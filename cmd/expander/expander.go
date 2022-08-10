@@ -91,5 +91,5 @@ func ExpandAction(inp string) (ret []string, str string, err error) {
 		}
 	}
 
-	return ret, service, nil
+	return ret, folded, nil
 }

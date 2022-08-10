@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/eugercek/aws-iam-policy-expander/cmd/expander"
+	"github.com/eugercek/polic/cmd/expander"
 )
 
 func Repl() int {
@@ -24,7 +24,7 @@ func Repl() int {
 		}
 
 		for _, v := range actions {
-			fmt.Println(color(v, base))
+			fmt.Println(color(v, base[:len(base)-1]))
 		}
 	}
 	return 0

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/eugercek/aws-iam-policy-expander/cli"
+	"github.com/eugercek/polic/cli"
 )
 
 func main() {
