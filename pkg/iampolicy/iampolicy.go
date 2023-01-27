@@ -21,13 +21,13 @@ type Policy struct {
 type Statement struct {
 	Id            string                   `json:"Sid,omitempty"`
 	Effect        string                   `json:"Effect"`
-	Action        StringOrArray            `json:"Action"`
-	NotAction     StringOrArray            `json:"NotAction,omitempty"`
+	Actions       StringOrArray            `json:"Actions"`
+	NotActions    StringOrArray            `json:"NotActions,omitempty"`
 	Principals    map[string]StringOrArray `json:"Principal,omitempty"`
 	NotPrincipals map[string]StringOrArray `json:"NotPrincipal,omitempty"`
 	Resources     StringOrArray            `json:"Resource,omitempty"`
 	NotResources  StringOrArray            `json:"NotResource,omitempty"`
-	Condition     StringOrArray            `json:"Condition,omitempty"`
+	Conditions    StringOrArray            `json:"Conditions,omitempty"`
 }
 
 type StringOrArray []string
@@ -95,8 +95,8 @@ func New(r io.Reader) (*Policy, error) {
 	}
 
 	for _, st := range policy.Statements {
-		if !isExclusive(st.Action, st.NotAction) {
-			return nil, fmt.Errorf("Statement %v: Action/NotAction error", st)
+		if !isExclusive(st.Actions, st.NotActions) {
+			return nil, fmt.Errorf("Statement %v: Actions/NotActions error", st)
 		}
 
 		if !isExclusive(st.Resources, st.NotResources) {

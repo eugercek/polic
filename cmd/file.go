@@ -34,18 +34,18 @@ func File(filename, resultFile string, sortFlag bool) int {
 		var setter func(int, []string)
 		var elems []string
 
-		if st.Action != nil {
+		if st.Actions != nil {
 			setter = func(i int, as []string) {
-				sts[i].Action = as
+				sts[i].Actions = as
 			}
-			elems = st.Action
-		} else if st.NotAction != nil {
+			elems = st.Actions
+		} else if st.NotActions != nil {
 			setter = func(i int, nas []string) {
-				sts[i].NotAction = nas
+				sts[i].NotActions = nas
 			}
-			elems = st.NotAction
+			elems = st.NotActions
 		} else {
-			log.Println("Action or NotAction must be given.")
+			log.Println("Actions or NotActions must be given.")
 			return 1
 		}
 
