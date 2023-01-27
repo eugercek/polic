@@ -2,21 +2,23 @@ package cmd
 
 import (
 	"fmt"
-
-	"github.com/eugercek/polic/internal/expander"
+	"github.com/eugercek/polic/internal"
 )
 
 func Repl() int {
 	for {
 		fmt.Print("Enter an AWS action:")
 		var inp string
-		fmt.Scanln(&inp)
+		_, err := fmt.Scanln(&inp)
+		if err != nil {
+			return 1
+		}
 
 		if inp == "exit" {
 			break
 		}
 
-		actions, base, err := expander.ExpandAction(inp)
+		actions, base, err := internal.ExpandAction(inp)
 
 		if err != nil {
 			fmt.Println(err)

@@ -1,12 +1,9 @@
-package expander
+package internal
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"strings"
+	"sync"
 )
 
 const (
@@ -14,7 +11,25 @@ const (
 	RemovePrefix = "app.PolicyEditorConfig="
 )
 
-var policyDocument *PolicyDocument
+var GlobalDocument Document
+
+type Document struct {
+	Doc *PolicyDocument
+	m   sync.Mutex
+}
+
+func (d *Document) Set(document *PolicyDocument) {
+	d.m.Lock()
+	defer d.m.Unlock()
+
+	d.Doc = document
+}
+func (d *Document) Get() *PolicyDocument {
+	d.m.Lock()
+	defer d.m.Unlock()
+
+	return d.Doc
+}
 
 type PolicyDocument struct {
 	ServiceMap map[string]Service `json:"serviceMap"`
@@ -25,40 +40,8 @@ type Service struct {
 	Actions      []string `json:"Actions"`
 }
 
-func getData() (err error) {
-	fmt.Println("Downloading policies...")
-	resp, err := http.Get(DownloadUrl)
-
-	if err != nil {
-		return err
-	}
-
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	body = body[len(RemovePrefix):] // It's used for editor config
-
-	var data PolicyDocument
-	err = json.Unmarshal(body, &data)
-
-	policyDocument = &data
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func ExpandAction(inp string) (ret []string, str string, err error) {
-	if policyDocument == nil {
-		err := getData()
-
-		if err != nil {
-			return nil, "", err
-		}
-	}
-
+	doc := GlobalDocument.Get()
 	args := strings.Split(inp, ":")
 
 	if len(args) != 2 {
@@ -74,7 +57,7 @@ func ExpandAction(inp string) (ret []string, str string, err error) {
 
 	var actions []string
 
-	for _, v := range policyDocument.ServiceMap {
+	for _, v := range doc.ServiceMap {
 		if v.StringPrefix == service {
 			actions = v.Actions
 			break

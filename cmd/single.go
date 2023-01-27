@@ -2,13 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/eugercek/polic/internal"
 	"strings"
-
-	"github.com/eugercek/polic/internal/expander"
 )
 
 func Single(action string) int {
-	actions, base, err := expander.ExpandAction(action)
+	actions, base, err := internal.ExpandAction(action)
 
 	if err != nil {
 		fmt.Println(err, action)

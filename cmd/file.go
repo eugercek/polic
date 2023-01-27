@@ -3,14 +3,12 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/eugercek/polic/internal"
 	"github.com/eugercek/polic/pkg/iampolicy"
-	"io/ioutil"
 	"log"
 	"os"
 	"sort"
 	"strings"
-
-	"github.com/eugercek/polic/internal/expander"
 )
 
 func File(filename, resultFile string, sortFlag bool) int {
@@ -51,7 +49,7 @@ func File(filename, resultFile string, sortFlag bool) int {
 
 		for _, str := range elems {
 			if strings.Contains(str, "*") {
-				exps, _, _ := expander.ExpandAction(str)
+				exps, _, _ := internal.ExpandAction(str)
 				actions = append(actions, exps...)
 			} else {
 				actions = append(actions, str)
@@ -65,12 +63,15 @@ func File(filename, resultFile string, sortFlag bool) int {
 		}
 	}
 
-	file.Close()
+	if err := file.Close(); err != nil {
+		return 1
+	}
 
 	f, _ := json.MarshalIndent(policy, "", "\t")
-	err = ioutil.WriteFile(resultFile, f, 0644)
+	err = os.WriteFile(resultFile, f, 0644)
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	return 0
 }

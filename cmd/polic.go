@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/eugercek/polic/internal"
 )
 
 func Run() int {
@@ -14,6 +16,28 @@ func Run() int {
 	sorted := flag.Bool("sort", false, "make actions sorted in files")
 
 	flag.Parse()
+
+	var doc internal.PolicyDocument
+	if !internal.CacheOk() {
+		fetch, err := internal.Fetch()
+		if err != nil {
+			return 1
+		}
+		doc = *fetch
+		bs, err := json.Marshal(doc)
+		if err != nil {
+			fmt.Println("error", err)
+		}
+		internal.FillCache(bs)
+	} else {
+		bs, err := internal.GetCache()
+		if err != nil {
+			return 1
+		}
+		json.Unmarshal(bs, &doc)
+	}
+
+	internal.GlobalDocument.Set(&doc)
 
 	if *single && *file == "" && !*repl {
 		if flag.Args() == nil {
