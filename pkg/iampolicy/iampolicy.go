@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	versionOld = "2008-10-17"
-	versionNew = "2012-10-17"
+	oldVersion = "2008-10-17"
+	newVersion = "2012-10-17"
 )
 
 type Policy struct {
@@ -88,7 +88,7 @@ func New(r io.Reader) (*Policy, error) {
 	// Check if policy is correct
 	// TODO: Check if all Sids are unique
 	// TODO: Check is 2008-10-17 versioned policy is valid
-	if policy.Version != versionOld && policy.Version != versionNew {
+	if policy.Version != oldVersion && policy.Version != newVersion {
 		return nil, errors.New("wrong Version")
 	} else if len(policy.Statements) == 0 {
 		return nil, errors.New("there should be at least one Statement")
