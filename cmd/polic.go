@@ -1,10 +1,8 @@
-package cli
+package cmd
 
 import (
 	"flag"
 	"fmt"
-
-	"github.com/eugercek/polic/cmd"
 )
 
 func Run() int {
@@ -27,7 +25,7 @@ func Run() int {
 			fmt.Println("No need for sort, single is always sorted")
 		}
 
-		return cmd.Single(flag.Args()[0])
+		return Single(flag.Args()[0])
 	} else if !*single && *file != "" && !*repl {
 		var resultFile string
 
@@ -40,12 +38,12 @@ func Run() int {
 			return 1
 		}
 
-		return cmd.File(*file, resultFile, *sorted)
+		return File(*file, resultFile, *sorted)
 	} else if !*single && *file == "" && *repl {
 		if *sorted {
 			fmt.Println("No need for sort, repl is always sorted")
 		}
-		return cmd.Repl()
+		return Repl()
 	} else {
 		fmt.Println("Wrong flag. Given")
 		return 1

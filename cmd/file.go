@@ -3,14 +3,14 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/eugercek/polic/pkg/iampolicy"
 	"io/ioutil"
 	"log"
 	"os"
 	"sort"
 	"strings"
 
-	"github.com/eugercek/polic/cmd/expander"
-	"github.com/eugercek/polic/cmd/policy"
+	"github.com/eugercek/polic/internal/expander"
 )
 
 func File(filename, resultFile string, sortFlag bool) int {
@@ -21,7 +21,7 @@ func File(filename, resultFile string, sortFlag bool) int {
 		return 1
 	}
 
-	policy, err := policy.New(file)
+	policy, err := iampolicy.New(file)
 
 	if err != nil {
 		log.Fatal(err)

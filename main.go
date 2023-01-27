@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/eugercek/polic/cli"
+	"github.com/eugercek/polic/cmd"
 )
 
 func main() {
-	os.Exit(cli.Run())
+	os.Exit(cmd.Run())
 }

@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	DOWNLOAD_URL  = "https://awspolicygen.s3.amazonaws.com/js/policies.js"
-	REMOVE_PREFIX = "app.PolicyEditorConfig="
+	DownloadUrl  = "https://awspolicygen.s3.amazonaws.com/js/policies.js"
+	RemovePrefix = "app.PolicyEditorConfig="
 )
 
 var policyDocument *PolicyDocument
@@ -27,7 +27,7 @@ type Service struct {
 
 func getData() (err error) {
 	fmt.Println("Downloading policies...")
-	resp, err := http.Get(DOWNLOAD_URL)
+	resp, err := http.Get(DownloadUrl)
 
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func getData() (err error) {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	body = body[len(REMOVE_PREFIX):] // It's used for editor config
+	body = body[len(RemovePrefix):] // It's used for editor config
 
 	var data PolicyDocument
 	err = json.Unmarshal(body, &data)

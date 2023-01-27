@@ -1,4 +1,4 @@
-package policy
+package iampolicy
 
 import (
 	"encoding/json"
@@ -45,7 +45,7 @@ func (s *StringOrArray) UnmarshalJSON(d []byte) error {
 
 	err := json.Unmarshal(d, &v)
 
-	*s = StringOrArray(v)
+	*s = v
 
 	return err
 }
@@ -65,7 +65,7 @@ func (s *StatementOrArray) UnmarshalJSON(d []byte) error {
 
 	err := json.Unmarshal(d, &v)
 
-	*s = StatementOrArray(v)
+	*s = v
 
 	return err
 }

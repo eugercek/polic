@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/eugercek/polic/cmd/expander"
+	"github.com/eugercek/polic/internal/expander"
 )
 
 func Repl() int {

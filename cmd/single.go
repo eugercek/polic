@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/eugercek/polic/cmd/expander"
+	"github.com/eugercek/polic/internal/expander"
 )
 
 func Single(action string) int {
