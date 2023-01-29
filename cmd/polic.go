@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/eugercek/polic/internal"
+	"os"
 )
 
 func Run() int {
@@ -62,7 +63,22 @@ func Run() int {
 			return 1
 		}
 
-		return File(*file, resultFile, *sorted)
+		finfo, err := os.Stat(resultFile)
+
+		if err != nil {
+			fmt.Println("Error: ", err)
+			return 1
+		}
+
+		if finfo.IsDir() {
+			if resultFile != *file {
+				fmt.Println("Only inline is supported on directories")
+			}
+			return Directory(*file, *sorted)
+		} else {
+			return File(*file, resultFile, *sorted)
+		}
+
 	} else if !*single && *file == "" && *repl {
 		if *sorted {
 			fmt.Println("No need for sort, repl is always sorted")

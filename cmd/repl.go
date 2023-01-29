@@ -7,7 +7,7 @@ import (
 
 func Repl() int {
 	for {
-		fmt.Print("Enter an AWS action:")
+		fmt.Print("> ")
 		var inp string
 		_, err := fmt.Scanln(&inp)
 		if err != nil {

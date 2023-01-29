@@ -6,11 +6,6 @@ import (
 	"sync"
 )
 
-const (
-	DownloadUrl  = "https://awspolicygen.s3.amazonaws.com/js/policies.js"
-	RemovePrefix = "app.PolicyEditorConfig="
-)
-
 var GlobalDocument Document
 
 type Document struct {

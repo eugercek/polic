@@ -7,6 +7,11 @@ import (
 	"net/http"
 )
 
+const (
+	DownloadUrl  = "https://awspolicygen.s3.amazonaws.com/js/policies.js"
+	RemovePrefix = "app.PolicyEditorConfig="
+)
+
 func Fetch() (*PolicyDocument, error) {
 	fmt.Println("Downloading policies...")
 	resp, err := http.Get(DownloadUrl)

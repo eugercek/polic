@@ -75,3 +75,26 @@ func File(filename, resultFile string, sortFlag bool) int {
 
 	return 0
 }
+
+func Directory(dirname string, sort bool) int {
+	dirents, err := os.ReadDir(dirname)
+
+	if err != nil {
+		fmt.Println("cannot open directory", err)
+		return 1
+	}
+
+	// TODO Add Concurrency
+	for _, de := range dirents {
+		if de.IsDir() {
+			if res := Directory(de.Name(), sort); res != 0 {
+				return res
+			}
+		}
+		if res := File(de.Name(), de.Name(), sort); res != 0 {
+			return res
+		}
+	}
+
+	return 0
+}
